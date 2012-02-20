@@ -8,3 +8,5 @@ Thumbs.db
 
 .rbenv-version
 .rvmrc
+.sass_cache/*
+.sass-cache/938515366f0d87dc865c65ac62753251297b918d/site.css.sassc
