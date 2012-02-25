@@ -257,8 +257,8 @@ task :parse_haml do
   puts "done."
 end
 
-desc "Launch preview environment"
-task :preview do
+desc "Launch preview dev environment"
+task :dev do
   Rake::Task["parse_haml"].invoke
   system "jekyll --auto --server"
 end
