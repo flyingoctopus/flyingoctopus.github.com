@@ -269,6 +269,57 @@ task :build do |task, args|
   system "jekyll"
 end
 
+# Create a New Post File
+# usage: rake write["Post Title Goes Here",category]
+desc "Given a title as an argument, create a new post file"
+task :write, [:title, :category] do |t, args|
+  filename = "#{Time.now.strftime('%Y-%m-%d')}-#{args.title.gsub(/\s/, '_').downcase}.markdown"
+  path = File.join("_posts", filename)
+  if File.exist? path; raise RuntimeError.new("Won't clobber #{path}"); end
+  File.open(path, 'w') do |file|
+    file.write <<-EOS
+---
+layout: post
+category: #{args.category}
+title: #{args.title}
+date: #{Time.now.strftime('%Y-%m-%d %k:%M:%S')}
+---
+EOS
+    end
+    puts "Now open #{path} in an editor."
+end
+
+# Combine and Minify CSS and JavaScript
+# DEPENDENCY: Juicer: http://cjohansen.no/en/ruby/juicer_a_css_and_javascript_packaging_tool
+# rake juicer:css # to combine master.css located at _site/style/master.css
+# rake juicer:js # to combine master.js located at _site/js/master.js
+namespace :juicer do
+  desc 'Merges stylesheets'
+    task :css => :"juicer:js" do
+      sh 'juicer merge --force _site/style/master.css'
+    end
+  desc 'Merges JavaScripts'
+    task :js do
+      sh  'juicer merge -i --force _site/js/master.js'
+    end
+end
+
+# Upload Files with RSync
+# DEPENDENCY: rsync
+# rake rsync:dryrun # If you're not sure, do dry-run
+# rake rsync:live # Rsync to your server
+namespace :rsync do
+  desc "--dry-run rsync"
+    task :dryrun do
+      system('rsync _site/ -ave ssh --dry-run --delete USERNAME@YOURDOMAIN.com:YOURHOSTDIRECTORY')
+    end
+  desc "rsync"
+    task :live do
+      system('rsync _site/ -ave ssh --delete USERNAME@YOURDOMAIN.com:YOURHOSTDIRECTORY')
+    end
+end
+
+
 # Internal: Download and process a theme from a git url.
 # Notice we don't know the name of the theme until we look it up in the manifest.
 # So we'll have to change the folder name once we get the name.
