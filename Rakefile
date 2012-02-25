@@ -247,8 +247,18 @@ end # end namespace :theme
 
 # Begin custom rake tasks for haml/css/coffeescript tools
 
+desc "Parse haml includes"
+task :parse_haml_includes do
+  print "Parsing Haml includes..."
+  system(%{
+    cd _includes/themes/minimal/haml && 
+    for f in *.haml; do [ -e $f ] && haml $f ../${f%.haml}.html; done
+  })
+  puts "done."
+end
+
 desc "Parse haml layouts"
-task :parse_haml do
+task :parse_haml_layouts do
   print "Parsing Haml layouts..."
   system(%{
     cd _layouts/haml && 
@@ -265,7 +275,8 @@ end
 
 desc "Build site"
 task :build do |task, args|
-  Rake::Task["parse_haml"].invoke
+  Rake::Task["parse_haml_includes"].invoke
+  Rake::Task["parse_haml_layouts"].invoke
   system "jekyll"
 end
 
