@@ -245,6 +245,30 @@ namespace :theme do
   
 end # end namespace :theme
 
+# Begin custom rake tasks for haml/css/coffeescript tools
+
+desc "Parse haml layouts"
+task :parse_haml do
+  print "Parsing Haml layouts..."
+  system(%{
+    cd _layouts/haml && 
+    for f in *.haml; do [ -e $f ] && haml $f ../${f%.haml}.html; done
+  })
+  puts "done."
+end
+
+desc "Launch preview environment"
+task :preview do
+  Rake::Task["parse_haml"].invoke
+  system "jekyll --auto --server"
+end
+
+desc "Build site"
+task :build do |task, args|
+  Rake::Task["parse_haml"].invoke
+  system "jekyll"
+end
+
 # Internal: Download and process a theme from a git url.
 # Notice we don't know the name of the theme until we look it up in the manifest.
 # So we'll have to change the folder name once we get the name.
