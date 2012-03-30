@@ -1,0 +1,75 @@
+---
+layout: post
+title: Skeleton Tracking with Kinect and Processing | Ideas For Dozens
+published: true
+---
+<div class="posterous_bookmarklet_entry">
+      <blockquote><div>
+						<p>
+  Ever since <a href="http://www.openni.org/">PrimeSense open sourced the Kinect middleware</a>, it’s been clear that body tracking interfaces were going to rapidly come within reach of hobbyists and artists.
+</p>
+<p></p>
+<p><em>PrimeSense demo video of skeleton tracking with the Kinect and their OpenNI middleware</em></p>
+<p>
+  The PrimeSense middleware takes the depth data coming from the Kinect camera and performs a process called “skeletonization”. It detects individual users who are within view of the camera and then tracks the positions of their bodies. All of a sudden, as a programmer, rather than having access to the pixels of a flat image, or even the depth information from the raw Kinect data, you now have a description of your users as a series of joints in space. For many applications, especially gesture-based interfaces and motion capture, this is exactly the data you need to get started.
+</p>
+<p>
+  Unfortunately, when the PrimeSense middleware was released the software reference implementation that went along with it was Windows only. Slowly but surely since then, this situation has improved. PrimeSense has released packages for Linux and OSX and the open source community has started to work towards integrating them into more accessible environments like <a href="http://www.processing.org/">Processing</a> and <a href="http://openframeworks.cc">Open Frameworks</a>. This process is not yet complete, but it has gotten to the point where and adventurous person can get started. This post documents my first successes doing just that.
+</p>
+<p>
+  The first step is getting all of the dependencies installed. A bit of a challenge at this point, but possible. (Note: this post is based on my experiences of doing this on OS X and will be specific to that.) <a href="http://tohmjudson.com/?p=30">Tohm Judson’s OpenNI to Max/MSP via OSC</a> tutorial is the best place to start. If you have never installed MacPorts before his directions will go rather smoothly (though there are a lot of steps). If you are unfortunate enough to have installed MacPorts before upgrading to Snow Leopard, you’re in for a bit of a struggle as the MacPorts automatic upgrade path seems to have gotten badly broken with that change. After much frustration I managed to uninstall all the ports that were affected by the upgrade problem (<a href="http://trac.macports.org/wiki/Migration">the MacPorts migration page</a> is a good place to start if you’re in a similar situation) and then proceeded through the rest of the steps outlined in Judson’s tutorial.
+</p>
+<p>
+  Judson’s tutorial is based around <a href="https://github.com/Sensebloom/OSCeleton">OSCeleton</a>, a proxy that broadcasts the skeleton data from the Kinect middleware as <a href="http://en.wikipedia.org/wiki/Open_Sound_Control">OSC</a> messages. OSC is a standard format for real time messaging similar to midi and is supported in many languages and platforms, including Processing and Open Frameworks. Once you’ve successfully gotten to the end of Judson’s tutorial, you’ll have OSC messages representing the skeleton data being transmitted and then you can start writing your own code that receives those messages and does whatever you want with the information.
+</p>
+<p>
+  Once I’d gotten everything successfully installed, I ran <a href="https://github.com/Sensebloom/OSCeleton-examples/tree/master/processing/Stickmanetic">the OSCeleton Stickmanetic</a> example just to make sure things were working:
+</p>
+<p>
+  <img src="https://img.skitch.com/20110216-1ir152wjp52my8f8dx5k4y7gt4.jpg" height="335" width="500" style="" />
+</p>
+<p>
+  This sketch simply uses the skeleton position information in 2D as an obstacle to some particles falling out of the sky with <a href="http://www.box2d.org/">Box 2D</a> for physics. It’s relatively silly, especially the choice of connecting the shoulder joints directly to the head rather than to the neck as seems a lot more intuitive, but it did prove to me that everything was installed and working successfully.
+</p>
+<p>
+  Then, as a basis for my own code I started with <a href="https://github.com/Sensebloom/OSCeleton-examples/tree/master/processing/MotionCapture3D">the OSCeleton Processing MotionCapture3D</a> example. This is a Processing sketch that reads the incoming OSC messages from OSCeleton, converts them into points in 3D space representing each of the joints of the body and draws a series of spheres at those points.
+</p>
+<p>
+  I wanted to also add lines between each of the joints so, after some experimentation, I used Processing’s beginShape() function and treated each adjacent pair of joints as vertices for lines. In working through this exercise I constructed the following map of how OSCeleton names each joint:
+</p>
+<p>
+  <img src="https://img.skitch.com/20110216-thqxt39wmdc4k94cach3yak25q.jpg" height="267" width="500" style="" />
+</p>
+<p>
+  Obviously, I’m only going into detail on the right side of the body, but equivalent nodes are available for the left arm and leg as well. In addition, it’s worth noting that for whatever reason I wasn’t actually seeing any collar, finger, or ankle joints. I don’t know what causes these to not come across, but in my setup they were not appearing in the OSC messages sent by OSCeleton.
+</p>
+<p>
+  Once I’d successfully finished drawing the vertices, I tried my sketch out with my roommate. Lo and behold, you can track two completely separate users no problem.
+</p>
+<p></p>
+<p>
+  A couple of notes about this video. Its sluggishness was caused by the screen capture software I used to record it, not the code itself. When not recording, it ran smoothly at a much higher frame rate on my machine. Also, many of the glitches here are caused by the constrained space of my room. The Kinect can obviously only process the parts of your body that it can see. My room is cramped enough that the two of us could barely fit within the Kinect’s field of view simultaneously. Some of the weird glitches you’re seeing here are when individual joints disappear from view and my code draws them as if they were at the top left corner of the screen.
+</p>
+<p>
+  But now that I’ve gotten the skeleton data into a form that I can use, what to do with it? The first thing I thought of was to use it to change the view of this skeleton itself. After all, even though I’m gathering this data in 3D, you’d barely know it from the display you’re seeing here. And most 3D browsing interfaces are incredibly unintuitive and hard to learn, maybe that’s an area of design where full-body gestures could actually be useful.
+</p>
+<p>
+  I added the <a href="http://www.gdsstudios.com/processing/libraries/ocd/">Obsessive Camera Direction library</a> to my Processing sketch. OCD is the best Processing camera library I know for intuitive control of the viewport. It has slightly more controls than the commonly used PeasyCam, but is less surprising in my experience.
+</p>
+<p>
+  After I had OCD installed, I configured it to always aim at the joint representing the right hand of the detected figure. Then I calculated the distance between the right and left hand and made it so that controlled the zoom. Moving your hands closer together would cause the camera to zoom in, moving them further apart would zoom out. Finally I made it so that raising both hands above your head would rotate the camera around the figure and moving both hands below the hips would rotate the camera around the opposite way.
+</p>
+<p>
+  Here’s what it looked like when I started playing with it:
+</p>
+<p></p>
+<p>
+  The code for this is available here: <a href="https://gist.github.com/828630">controlling a 3d camera via gestures with kinect in Processing</a>. This video is dramatically improved from the one above because, in the interim, I discovered <a href="http://www.processing.org/reference/libraries/video/MovieMaker.html">MovieMaker</a>, a built-in class that makes it incredibly easy to record movie files of a sketch from directly within Processing.
+</p>
+<p>
+ A next obvious experiment to conduct along this path would be to use this interface to navigate around more interesting 3D data, like a pre-existing 3D model. It would be especially cool to use your head to determine the location and angle of a camera within a 3D space to provide navigation and recording of a virtual environment. And then to use the position of your hands to fast forward or rewind various 3D motions being played back within the virtuality.
+</p>
+<p>
+  Another interesting area that I plan to explore soon is creating 3D “hot spots” for interfaces. In other words, mapping particular parts of 3D space to various application controls that can then be triggered by moving different parts of your body into them. Matching these hot spots to actual physical objects or locations within a real room is particularly interesting. Imagine: bringing your left hand near the top of your bookcase turns on a light, putting your right hand there turns it back off, etc. The possibilities are endless.</p>
+											</div></blockquote><div class="posterous_quote_citation">via <a href="http://urbanhonking.com/ideasfordozens/2011/02/16/skeleton-tracking-with-kinect-and-processing/">urbanhonking.com</a></div>
+    <p>It's so on. Thanks PrimeSense!</p></div>

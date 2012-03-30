@@ -1,0 +1,62 @@
+---
+layout: post
+title: Xcode, GCC, and Homebrew
+published: true
+---
+<div class="posterous_bookmarklet_entry">
+      <blockquote><div>
+    <p>Several months ago, I got fed up with having to download Xcode to build my software.
+I took the Xcode installer, ripped out all of the parts I didn't need, and made a nice
+installer for GCC. It ended up being ~200MB in size. It took 2 minutes to download.</p>
+<p><a href="https://github.com/kennethreitz/osx-gcc-installer/">OSX-GCC-Installer</a> was born. Perfect.</p>
+<p>Unfortunately, I couldn't include the 10.6/7 SDKs due to licensing restrictions.
+These SDKs include CoreAudio, CoreData, OpenGL, and more. Most software that isn't build
+specifically for OSX would build perfectly. Unfortunately, some software added some
+needless system dependencies, though (I'm looking at you, Node).</p>
+<p>I stuck it up on GitHub, and much to my delight, it became a pretty bit hit.
+It solved a lot of headaches for a lot of people.</p>
+<p>Today, the project has 1319 watchers on GitHub and has been downloaded 33,200 times.
+That's <strong>8.3 Terabytes</strong> of transfer. Thanks, GitHub, for the
+generous hosting.</p>
+<p>Homebrew did their best to support the project, but the official stance was "if
+you buy a Mac, you buy the whole package", pointing everyone to install full Xcode
+if they had any problems. Far from ideal, but I was content.</p>
+<div>
+<h3>Apple's Interest</h3>
+<p>Meanwhile, Apple reached out to me to discuss some details about OSX-GCC-Installer.
+They took an interest in shipping something official, but they weren't sure of the proper
+approach to take to support projects like Homebrew.</p>
+<p>I hopped on the phone, explained the specific needs of Homebrew, the restrictions
+with the proprietary headers and licensing, and what the ideal situation would be.</p>
+<p>Months passed and I didn't hear anything. Until today.</p>
+</div>
+<div>
+<h3>Command Line Tools for Xcode</h3>
+<p>Today, Apple added a beautiful new package to their official developer tools suite:
+<strong>Command Line Tools for Xcode</strong>. It's a 171 MB download that includes all of the
+tools a Homebrew should ever need. Best of all, it contains the proprietary
+headers that I couldn't ship myself.</p>
+<p>You can <a href="http://developer.apple.com/downloads">download and try it out</a> today.
+All you need is a free Apple ID.</p>
+<p>Major props to Apple, and a very special thanks to the Product Manager of Xcode,
+<a href="https://twitter.com/timtr">Tim Triemstra</a>, for making this happen.</p>
+</div>
+<div>
+<h3>The Future</h3>
+<p>This is an incredible day for the Homebrew community.
+You can now setup a complete OS X develop environment with a single 171.7 MB package download.
+It's official. It's legal. It'll be maintained.</p>
+<p>Homebrew is going to officially support the package too.</p>
+<p>Max Howell:</p>
+<blockquote>
+To stave off further questions, yes, you can use the "Command Line Tools for Xcode" package with Homebrew. And we will support it.</blockquote>
+<p>Mike McQuaid:</p>
+<blockquote class="posterous_short_quote">
+We will recommend you don't use Xcode from the App Store but instead the command-line-tools package (which can also be installed from inside of Xcode and lives happily alongside it).</blockquote>
+<p>Open source is incredible.</p>
+</div>
+
+  </div></blockquote>
+
+<div class="posterous_quote_citation">via <a href="http://kennethreitz.com/xcode-gcc-and-homebrew.html">kennethreitz.com</a></div>
+    <p>This is some amazing news. Absolutely amazing.</p></div>
